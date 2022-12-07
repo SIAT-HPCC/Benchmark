@@ -1,0 +1,8 @@
+
+for((i=0;i<$1;i++)); do mkdir remd$i; cp  *.itp init.gro fws_plus.top remd$i ; done
+python temp.py $1
+
+#mkdir remd{0..512}
+##(for dir in remd{0..512}; do cp  *.itp init.gro fws_plus.top $dir; done)
+#(for dir in remd{0..512}; do cd $dir; gmx_mpi  grompp -f remd.mdp -c init.gro -p fws_plus.top -o remd.tpr  -maxwarn 5; cd ..; done) 
+

@@ -1,0 +1,52 @@
+;
+;	File 'fws_plus.top' was generated
+;	By user: root (5588)
+;	On host: gsnew2034
+;	At date: Mon Jun 27 10:26:06 2022
+;
+;	This is a standalone topology file
+;
+;	Created by:
+;	                    :-) GROMACS - gmx pdb2gmx, 2018.4 (-:
+;	
+;	Executable:   /home_gsx/Soft/Gromacs/2018.4_oneapi/bin/gmx_mpi
+;	Data prefix:  /home_gsx/Soft/Gromacs/2018.4_oneapi
+;	Working dir:  /home_gsx/users/nsgsx_wyj2/yinghuang/testduc/spike_1Matoms-1
+;	Command line:
+;	  gmx_mpi pdb2gmx -ignh -f start-1.pdb -o fws.gro -p fws_plus.top -water tip3p -renum
+;	Force field was read from the standard GROMACS share directory.
+;
+
+; Include forcefield parameters
+#include "charmm27.ff/forcefield.itp"
+
+; Include chain topologies
+#include "fws_plus_Protein.itp"
+#include "fws_plus_Protein2.itp"
+#include "fws_plus_Protein3.itp"
+
+; Include water topology
+#include "charmm27.ff/tip3p.itp"
+
+#ifdef POSRES_WATER
+; Position restraint for each water oxygen
+[ position_restraints ]
+;  i funct       fcx        fcy        fcz
+   1    1       1000       1000       1000
+#endif
+
+; Include topology for ions
+#include "charmm27.ff/ions.itp"
+
+[ system ]
+; Name
+Protein in water
+
+[ molecules ]
+; Compound        #mols
+Protein             1
+Protein2            1
+Protein3            1
+SOL         324002
+NA               48
+CL               31

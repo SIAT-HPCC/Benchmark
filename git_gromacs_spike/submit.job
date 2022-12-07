@@ -1,0 +1,27 @@
+#!/bin/bash
+#SBATCH -J GROMACS-DCU
+#SBATCH -p normal
+#SBATCH -N 256
+#SBATCH --ntasks-per-node=4
+#SBATCH --cpus-per-task=8
+#SBATCH --gres=dcu:4
+hostfile=./$SLURM_JOB_ID
+module rm mpi/openmpi/4.0.4/gcc-7.3.1
+module load mpi/hpcx/2.7.4/gcc-7.3.1
+module load apps/gromacs-DCU/2018.7/hpcx-2.7.4-gcc-7.3.1
+
+srun hostname |sort |uniq  |awk '{printf "%s\n",$1}'> hostfile
+((num_procs=$SLURM_JOB_NUM_NODES*4))
+
+#mpirun -np $num_procs --hostfile hostfile -N 4 ./wrapper.sh
+
+#sh do_build 512
+
+(for dir in remd{0..511}; do cd $dir; gmx_mpi  grompp -f remd.mdp -c init.gro -p fws_plus.top -o remd.tpr  -maxwarn 5; cd ..; done)
+mpirun -np $num_procs --hostfile hostfile -N 4 gmx_mpi mdrun -multidir remd{0..511} -replex 500 -nsteps 20000 -deffnm remd -pin on -nb gpu -pme cpu 
+###########README############################################
+#-nb <enum> (auto) Calculate non-bonded interactions on: auto, cpu, gpu
+#-pme <enum> (auto)Perform PME calculations on: auto, cpu, gpu
+#-pmefft <enum> (auto)Perform PME FFT calculations on: auto, cpu, gpu
+#http://manual.gromacs.org/documentation/5.1/user-guide/mdrun-performance.html
+#http://bbs.keinsci.com/thread-13861-1-1.html
